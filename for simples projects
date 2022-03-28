@@ -1,0 +1,118 @@
+#IMPORTING MODLES AND LIBARIES
+#importing pandas
+import pandas as pd
+# merging 3 csv dataset files
+df = pd.concat(
+    map(pd.read_csv, ['D://dataset/connectivity_status.csv', 'D://dataset/orders.csv', 'D://dataset/polling.csv']), ignore_index=True)
+print(df)
+        Unnamed: 0            creation_time   status  \
+0                0  2020-02-26 19:31:29.998  OFFLINE   
+1                1  2020-02-26 19:31:39.677   ONLINE   
+2                2  2020-02-26 20:08:42.789  OFFLINE   
+3                3  2020-02-26 20:09:03.448   ONLINE   
+4                4  2020-02-26 00:30:03.439  OFFLINE   
+...            ...                      ...      ...   
+388356      350440  2020-02-26 00:01:06.391      NaN   
+388357      350441  2020-02-26 00:00:50.194      NaN   
+388358      350442  2020-02-26 00:00:35.031      NaN   
+388359      350443  2020-02-26 00:00:19.871      NaN   
+388360      350444  2020-02-26 00:00:04.552      NaN   
+
+                                   device_id order_creation_time  order_id  \
+0       00083c70-7f54-4324-94bd-b0cb0be78baf                 NaN       NaN   
+1       00083c70-7f54-4324-94bd-b0cb0be78baf                 NaN       NaN   
+2       000fec74-a5b4-40fc-b93c-eef3b2afb87e                 NaN       NaN   
+3       000fec74-a5b4-40fc-b93c-eef3b2afb87e                 NaN       NaN   
+4       001d3c67-99fd-43b7-8207-f420fa303a49                 NaN       NaN   
+...                                      ...                 ...       ...   
+388356  f6ef8126-4539-4296-8f18-0dbabde50361                 NaN       NaN   
+388357  f6ef8126-4539-4296-8f18-0dbabde50361                 NaN       NaN   
+388358  f6ef8126-4539-4296-8f18-0dbabde50361                 NaN       NaN   
+388359  f6ef8126-4539-4296-8f18-0dbabde50361                 NaN       NaN   
+388360  f6ef8126-4539-4296-8f18-0dbabde50361                 NaN       NaN   
+
+       error_code  status_code  
+0             NaN          NaN  
+1             NaN          NaN  
+2             NaN          NaN  
+3             NaN          NaN  
+4             NaN          NaN  
+...           ...          ...  
+388356        NaN        200.0  
+388357        NaN        200.0  
+388358        NaN        200.0  
+388359        NaN        200.0  
+388360        NaN        200.0  
+
+[388361 rows x 8 columns]
+df.head()
+Unnamed: 0	creation_time	status	device_id	order_creation_time	order_id	error_code	status_code
+0	0	2020-02-26 19:31:29.998	OFFLINE	00083c70-7f54-4324-94bd-b0cb0be78baf	NaN	NaN	NaN	NaN
+1	1	2020-02-26 19:31:39.677	ONLINE	00083c70-7f54-4324-94bd-b0cb0be78baf	NaN	NaN	NaN	NaN
+2	2	2020-02-26 20:08:42.789	OFFLINE	000fec74-a5b4-40fc-b93c-eef3b2afb87e	NaN	NaN	NaN	NaN
+3	3	2020-02-26 20:09:03.448	ONLINE	000fec74-a5b4-40fc-b93c-eef3b2afb87e	NaN	NaN	NaN	NaN
+4	4	2020-02-26 00:30:03.439	OFFLINE	001d3c67-99fd-43b7-8207-f420fa303a49	NaN	NaN	NaN	NaN
+#total count of all polling event
+df.isna().sum()
+Unnamed: 0                  0
+creation_time            2357
+status                 352802
+device_id                  26
+order_creation_time    386004
+order_id               386004
+error_code             387035
+status_code             37916
+dtype: int64
+df.isna().any().sum()
+7
+import csv
+df.to_csv('out.csv')
+#printing into a single csv
+df.to_csv(r'D:/master_dataset.csv', index = False)
+df.isna().any().sum()
+7
+#three mins before order time was createxd
+import time
+import datetime
+now = datetime.datetime.now()
+datetime.datetime.now() - datetime.timedelta(minutes=3)
+print(current_time)
+2022-03-24 22:10
+#Three minutes after the order creation time
+from datetime import datetime
+from datetime import timedelta
+# Given timestamp in string
+time_str = '24/3/2022 11:12:22.234513'
+date_format_str = '%d/%m/%Y %H:%M:%S.%f'
+
+# create datetime object from timestamp string
+given_time = datetime.strptime(time_str, date_format_str)
+print('Given timestamp: ', given_time)
+n = 3
+
+# Add 3 minutes to datetime object
+final_time = given_time + timedelta(minutes=n)
+print('Final Time (3 minutes after given time ): ', final_time)
+
+# Convert datetime object to string in specific format for the polling events 
+final_time_str = final_time.strftime('%d/%m/%Y %H:%M:%S.%f')
+print('Final Time as string object: ', final_time_str)
+Given timestamp:  2022-03-24 11:12:22.234513
+Final Time (3 minutes after given time ):  2022-03-24 11:15:22.234513
+Final Time as string object:  24/03/2022 11:15:22.234513
+#One hour before the order creation time
+
+now = datetime.datetime.now()
+datetime.datetime.now() - datetime.timedelta(minutes=60)
+print(current_time)
+2022-03-24 22:10
+#The most recent connectivity status (“ONLINE” or “OFFLINE”) before an order, and at
+#what time the order changed to this status. This can be across any period of time
+#before the order creation time. Not all devices have a connectivity status.
+
+
+
+
+df['master_dataset'] = df.groupby('status')['order_id'].rank(method='first', ascending=False)
+df = df[df.master_dataset == 1]
+df.head()
